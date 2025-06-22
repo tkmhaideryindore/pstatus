@@ -88,3 +88,12 @@ iframe {
 .view-btn:hover {
   background-color: #138496;
 }
+
+.test-btn {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.test-btn:hover {
+  background-color: #e0a800;
+}
