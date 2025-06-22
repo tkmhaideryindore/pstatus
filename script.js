@@ -59,17 +59,44 @@ async function searchSheet() {
     console.log('First few rows:', rows.slice(0, 3));
     console.log('Searching for:', searchTerm.trim());
 
+    // Find the ITS_ID column index from the header row
+    const headerRow = rows[0];
+    console.log('Header row:', headerRow);
+    
+    let itsIdColumnIndex = -1;
+    let remarkColumnIndex = -1;
+    
+    // Look for ITS_ID column
+    for (let i = 0; i < headerRow.length; i++) {
+      const header = headerRow[i].toString().trim().replace(/"/g, '').toLowerCase();
+      console.log(`Column ${i} header: "${header}"`);
+      if (header.includes('its_id') || header.includes('itsid')) {
+        itsIdColumnIndex = i;
+      }
+      if (header.includes('remarks') || header.includes('remarks')) {
+        remarkColumnIndex = i;
+      }
+    }
+    
+    console.log('ITS_ID column index:', itsIdColumnIndex);
+    console.log('Remark column index:', remarkColumnIndex);
+    
+    if (itsIdColumnIndex === -1) {
+      throw new Error('ITS_ID column not found in the spreadsheet');
+    }
+
     const matchingRow = rows.find((row, index) => {
-      const cellValue = row[0] ? row[0].toString().trim().replace(/"/g, '') : '';
-      console.log(`Row ${index}: Column A value = "${cellValue}"`);
+      if (index === 0) return false; // Skip header row
+      const cellValue = row[itsIdColumnIndex] ? row[itsIdColumnIndex].toString().trim().replace(/"/g, '') : '';
+      console.log(`Row ${index}: ITS_ID value = "${cellValue}"`);
       return cellValue === searchTerm.trim();
     });
 
     if (matchingRow) {
       const fullName = matchingRow[1] || 'Name not available';
-      const status = matchingRow[6] || 'No status available';
-      const result = `${fullName} - Status: ${status}`;
-      statusDisplay.innerHTML = `${fullName} - Status: <b>${status}</b>`;
+      const remark = remarkColumnIndex !== -1 ? (matchingRow[remarkColumnIndex] || 'No remark available') : 'Remark column not found';
+      const result = `${fullName} - Remark: ${remark}`;
+      statusDisplay.innerHTML = `${fullName} - Remark: <b>${remark}</b>`;
       addLogEntry(searchTerm, 'Found: ' + result);
     } else {
       statusDisplay.textContent = 'NOT A VALID PASS ENTRY';
