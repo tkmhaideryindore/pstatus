@@ -28,18 +28,42 @@ async function searchSheet() {
     }
 
     const csvText = await response.text();
-    console.log('Received CSV data:', csvText.substring(0, 100)); // Log first 100 chars
+    console.log('Received CSV data:', csvText.substring(0, 200)); // Log first 200 chars
 
     if (!csvText) {
       throw new Error('No data received from spreadsheet');
     }
 
-    const rows = csvText.split('\n').map(row => row.split(','));
+    // Better CSV parsing to handle quoted values
+    const rows = csvText.split('\n').map(row => {
+      const result = [];
+      let current = '';
+      let inQuotes = false;
+      
+      for (let i = 0; i < row.length; i++) {
+        const char = row[i];
+        if (char === '"') {
+          inQuotes = !inQuotes;
+        } else if (char === ',' && !inQuotes) {
+          result.push(current.trim());
+          current = '';
+        } else {
+          current += char;
+        }
+      }
+      result.push(current.trim());
+      return result;
+    });
+    
     console.log('Number of rows:', rows.length);
+    console.log('First few rows:', rows.slice(0, 3));
+    console.log('Searching for:', searchTerm.trim());
 
-    const matchingRow = rows.find(row => 
-      row[0] && row[0].toString().trim() === searchTerm.trim()
-    );
+    const matchingRow = rows.find((row, index) => {
+      const cellValue = row[0] ? row[0].toString().trim().replace(/"/g, '') : '';
+      console.log(`Row ${index}: Column A value = "${cellValue}"`);
+      return cellValue === searchTerm.trim();
+    });
 
     if (matchingRow) {
       const fullName = matchingRow[1] || 'Name not available';
