@@ -1,8 +1,19 @@
 
+function addLogEntry(searchTerm, result) {
+  const logDisplay = document.getElementById('logDisplay');
+  if (logDisplay) {
+    const timestamp = new Date().toLocaleString();
+    const logEntry = document.createElement('div');
+    logEntry.className = 'log-entry';
+    logEntry.textContent = `${timestamp} - Searched: ${searchTerm} - ${result}`;
+    logDisplay.insertBefore(logEntry, logDisplay.firstChild);
+  }
+}
+
 async function searchSheet() {
   const searchTerm = document.getElementById('searchInput').value.trim();
   const statusDisplay = document.getElementById('statusDisplay');
-  
+
   if (!searchTerm) {
     statusDisplay.textContent = 'Please enter a search term';
     statusDisplay.classList.add('active');
@@ -15,37 +26,45 @@ async function searchSheet() {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    
+
     const csvText = await response.text();
     console.log('Received CSV data:', csvText.substring(0, 100)); // Log first 100 chars
-    
+
     if (!csvText) {
       throw new Error('No data received from spreadsheet');
     }
 
     const rows = csvText.split('\n').map(row => row.split(','));
     console.log('Number of rows:', rows.length);
-    
+
     const matchingRow = rows.find(row => 
       row[0] && row[0].toString().trim() === searchTerm.trim()
     );
-    
+
     if (matchingRow) {
       const fullName = matchingRow[1] || 'Name not available';
       const status = matchingRow[6] || 'No status available';
-      //statusDisplay.textContent = `${fullName} - Status: ${status}`;
-statusDisplay.innerHTML = `${fullName} - Status: <b>${status}</b>`;
+      const result = `${fullName} - Status: ${status}`;
+      statusDisplay.innerHTML = `${fullName} - Status: <b>${status}</b>`;
+      addLogEntry(searchTerm, 'Found: ' + result);
     } else {
       statusDisplay.textContent = 'NOT A VALID PASS ENTRY';
+      addLogEntry(searchTerm, 'No valid pass entry');
     }
   } catch (error) {
     console.error('Error details:', error);
     statusDisplay.textContent = `Error fetching data: ${error.message}`;
+    addLogEntry(searchTerm, 'Error: ' + error.message);
   }
   statusDisplay.classList.add('active');
+  
+  // Clear input after successful search
+  document.getElementById('searchInput').value = '';
+  
+  // Auto-hide result after 15 seconds instead of refreshing entire page
   setTimeout(function() {
-    location.reload();
-  }, 10000); // 10000 ms = 10 seconds
+    statusDisplay.classList.remove('active');
+  }, 15000);
 }
 
 // Allow search on Enter key press
