@@ -43,6 +43,9 @@ statusDisplay.innerHTML = `${fullName} - Status: <b>${status}</b>`;
     statusDisplay.textContent = `Error fetching data: ${error.message}`;
   }
   statusDisplay.classList.add('active');
+  setTimeout(function() {
+    location.reload();
+  }, 10000); // 10000 ms = 10 seconds
 }
 
 // Allow search on Enter key press
