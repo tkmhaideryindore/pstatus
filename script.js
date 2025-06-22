@@ -159,30 +159,75 @@ function getSessionId() {
 
 // Send log entry to Google Sheets via Apps Script
 async function sendLogToSheet(logEntry) {
-  // You'll need to replace this URL with your Google Apps Script web app URL
-  const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyPcVx_0MSksBB6BO6h2PSb2GorfxQyR7mbcOgNxJchV9iCiC7qnSu5G4WtgC1oqU5r/exec';
+  // IMPORTANT: Replace this with your actual deployed Google Apps Script URL
+  const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzSqJo_ZZrVgnl9QXS4K5BZY1IhjW1xuGDS0fZfMDRhotg78p9qb4rYwvgCo2ex-KQQ/exec';
 
-  const response = await fetch(YOUR_APPS_SCRIPT_URL_HERE, {
-    method: 'POST',
-    mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
+  // Method 1: Try URL parameters (most reliable)
+  try {
+    const params = new URLSearchParams({
       timestamp: logEntry.timestamp,
       searchTerm: logEntry.searchTerm,
       result: logEntry.result,
       status: logEntry.status,
       userAgent: logEntry.userAgent,
       sessionId: logEntry.sessionId
-    })
-  });
+    });
 
-  if (!response.ok) {
-    throw new Error(`HTTP error! status: ${response.status}`);
+    const urlWithParams = `${GOOGLE_APPS_SCRIPT_URL}?${params.toString()}`;
+
+    await fetch(urlWithParams, {
+      method: 'POST',
+      mode: 'no-cors'
+    });
+
+    console.log('Log sent to Google Sheets via URL parameters');
+    return { success: true };
+
+  } catch (urlError) {
+    console.error('URL method failed:', urlError);
+
+    // Method 2: Try form data
+    try {
+      const formData = new FormData();
+      formData.append('timestamp', logEntry.timestamp);
+      formData.append('searchTerm', logEntry.searchTerm);
+      formData.append('result', logEntry.result);
+      formData.append('status', logEntry.status);
+      formData.append('userAgent', logEntry.userAgent);
+      formData.append('sessionId', logEntry.sessionId);
+
+      await fetch(GOOGLE_APPS_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        body: formData
+      });
+
+      console.log('Log sent to Google Sheets via form data');
+      return { success: true };
+
+    } catch (formError) {
+      console.error('Form data method also failed:', formError);
+
+      // Method 3: Try JSON (last resort)
+      try {
+        await fetch(GOOGLE_APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(logEntry)
+        });
+
+        console.log('Log sent to Google Sheets via JSON');
+        return { success: true };
+
+      } catch (jsonError) {
+        console.error('All methods failed:', jsonError);
+        throw new Error('Failed to send log to Google Sheets');
+      }
+    }
   }
-
-  return await response.json();
 }
 
 function downloadLogs() {
@@ -195,7 +240,7 @@ function downloadLogs() {
 
   // Convert logs to CSV format
   const csvHeader = 'Timestamp,Search Term,Result,Status,User Agent,Session ID\n';
-  const csvContent = logs.map(log => 
+  const csvContent = logs.map(log =>
     `"${log.timestamp}","${log.searchTerm}","${log.result}","${log.status}","${log.userAgent}","${log.sessionId || 'N/A'}"`
   ).join('\n');
 
@@ -224,3 +269,48 @@ function clearLogs() {
 function openGoogleSheet() {
   window.open('https://docs.google.com/spreadsheets/d/1EvpStANT4Ncyinx4jDSB6wPfOztuZar4PP8b1GA_J1s/edit', '_blank');
 }
+
+// Test function to manually test Google Sheets logging
+async function testGoogleSheetsLogging() {
+  const testEntry = {
+    timestamp: new Date().toISOString(),
+    searchTerm: 'TEST_' + Date.now(),
+    result: 'Manual Test Entry',
+    status: 'TEST',
+    userAgent: navigator.userAgent,
+    sessionId: getSessionId()
+  };
+
+  try {
+    await sendLogToSheet(testEntry);
+    alert('Test log sent successfully! Check the Google Sheet.');
+  } catch (error) {
+    alert('Test failed: ' + error.message);
+    console.error('Manual test failed:', error);
+  }
+}
+
+function getLogCount() {
+  const logs = JSON.parse(localStorage.getItem('searchLogs') || '[]');
+  return logs.length;
+}
+
+function updateLogCount() {
+  const count = getLogCount();
+  document.getElementById('logCount').textContent = `Local Logs: ${count}`;
+}
+
+// Initialize log count on page load
+document.addEventListener('DOMContentLoaded', function() {
+  updateLogCount();
+
+  // Add test button to console
+  console.log('To test Google Sheets logging, run: testGoogleSheetsLogging()');
+});
+
+// Update log count after each search
+const originalAddLogEntry = addLogEntry;
+window.addLogEntry = async function(searchTerm, result, status) {
+  await originalAddLogEntry(searchTerm, result, status);
+  updateLogCount();
+};
