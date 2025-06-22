@@ -83,10 +83,8 @@ async function searchSheet() {
 
     if (matchingRow) {
       const fullName = matchingRow[1] || 'Name not available';
-      const remark = remarkColumnIndex !== -1 ? (matchingRow[remarkColumnIndex] || 'No remark available') : 'Remark column not found';
-      const result = `${fullName} - Remark: ${remark}`;
-      statusDisplay.innerHTML = `${fullName} - Remark: <b>${remark}</b>`;
-      addLogEntry(searchTerm, 'Found: ' + result);
+      statusDisplay.innerHTML = `${fullName} - <b>VALID PASS ENTRY</b>`;
+      addLogEntry(searchTerm, `Found: ${fullName} - VALID PASS ENTRY`);
     } else {
       statusDisplay.textContent = 'NOT A VALID PASS ENTRY';
       addLogEntry(searchTerm, 'No valid pass entry');
