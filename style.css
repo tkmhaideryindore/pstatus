@@ -49,10 +49,23 @@ button:hover {
   font-size: 18px;
   text-align: center;
   border: 1px solid #ddd;
+  font-weight: bold;
 }
 
 .status-display.active {
   display: block;
+}
+
+.status-display.valid {
+  color: #28a745;
+  background-color: #d4edda;
+  border-color: #c3e6cb;
+}
+
+.status-display.invalid {
+  color: #dc3545;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
 }
 
 iframe {
