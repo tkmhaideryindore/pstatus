@@ -84,14 +84,11 @@ async function searchSheet() {
     if (matchingRow) {
       const fullName = matchingRow[1] || 'Name not available';
       statusDisplay.innerHTML = `${fullName} - <b>VALID PASS ENTRY</b>`;
-      addLogEntry(searchTerm, `Found: ${fullName} - VALID PASS ENTRY`);
     } else {
       statusDisplay.textContent = 'NOT A VALID PASS ENTRY';
-      addLogEntry(searchTerm, 'No valid pass entry');
     }
   } catch (error) {
     statusDisplay.textContent = `Error fetching data`;
-    addLogEntry(searchTerm, 'Error occurred');
   }
   statusDisplay.classList.add('active');
   
