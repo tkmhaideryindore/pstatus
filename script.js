@@ -36,7 +36,7 @@ async function searchSheet() {
       //statusDisplay.textContent = `${fullName} - Status: ${status}`;
 statusDisplay.innerHTML = `${fullName} - Status: <b>${status}</b>`;
     } else {
-      statusDisplay.textContent = 'Congratulation!! your data and photo is verified.';
+      statusDisplay.textContent = 'NOT A VALID PASS ENTRY';
     }
   } catch (error) {
     console.error('Error details:', error);
