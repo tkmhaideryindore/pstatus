@@ -11,7 +11,7 @@ async function searchSheet() {
 
   try {
     // Update the URL to use the direct CSV export URL format
-    const response = await fetch('https://docs.google.com/spreadsheets/d/17grn0kOCr5QUNtEEGnLOKUaRXJF03cEve0sxTuY0FFk/export?format=csv&gid=0');
+    const response = await fetch('https://docs.google.com/spreadsheets/d/17grn0kOCr5QUNtEEGnLOKUaRXJF03cEve0sxTuY0FFk/edit?gid=0#gid=0&output=csv');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
