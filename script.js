@@ -21,14 +21,13 @@ async function searchSheet() {
   }
 
   try {
-    // Update the URL to use the direct CSV export URL format
-    const response = await fetch('https://docs.google.com/spreadsheets/d/17grn0kOCr5QUNtEEGnLOKUaRXJF03cEve0sxTuY0FFk/export?format=csv&gid=0');
+    // Get URL from config
+    const response = await fetch(getSheetUrl());
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
 
     const csvText = await response.text();
-    console.log('Received CSV data:', csvText.substring(0, 200)); // Log first 200 chars
 
     if (!csvText) {
       throw new Error('No data received from spreadsheet');
@@ -54,14 +53,9 @@ async function searchSheet() {
       result.push(current.trim());
       return result;
     });
-    
-    console.log('Number of rows:', rows.length);
-    console.log('First few rows:', rows.slice(0, 3));
-    console.log('Searching for:', searchTerm.trim());
 
     // Find the ITS_ID column index from the header row
     const headerRow = rows[0];
-    console.log('Header row:', headerRow);
     
     let itsIdColumnIndex = -1;
     let remarkColumnIndex = -1;
@@ -69,7 +63,6 @@ async function searchSheet() {
     // Look for ITS_ID column
     for (let i = 0; i < headerRow.length; i++) {
       const header = headerRow[i].toString().trim().replace(/"/g, '').toLowerCase();
-      console.log(`Column ${i} header: "${header}"`);
       if (header.includes('its_id') || header.includes('itsid')) {
         itsIdColumnIndex = i;
       }
@@ -78,9 +71,6 @@ async function searchSheet() {
       }
     }
     
-    console.log('ITS_ID column index:', itsIdColumnIndex);
-    console.log('Remark column index:', remarkColumnIndex);
-    
     if (itsIdColumnIndex === -1) {
       throw new Error('ITS_ID column not found in the spreadsheet');
     }
@@ -88,7 +78,6 @@ async function searchSheet() {
     const matchingRow = rows.find((row, index) => {
       if (index === 0) return false; // Skip header row
       const cellValue = row[itsIdColumnIndex] ? row[itsIdColumnIndex].toString().trim().replace(/"/g, '') : '';
-      console.log(`Row ${index}: ITS_ID value = "${cellValue}"`);
       return cellValue === searchTerm.trim();
     });
 
@@ -103,9 +92,8 @@ async function searchSheet() {
       addLogEntry(searchTerm, 'No valid pass entry');
     }
   } catch (error) {
-    console.error('Error details:', error);
-    statusDisplay.textContent = `Error fetching data: ${error.message}`;
-    addLogEntry(searchTerm, 'Error: ' + error.message);
+    statusDisplay.textContent = `Error fetching data`;
+    addLogEntry(searchTerm, 'Error occurred');
   }
   statusDisplay.classList.add('active');
   
