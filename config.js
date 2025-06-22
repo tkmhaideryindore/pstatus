@@ -1,4 +1,3 @@
-
 // Configuration - Keep this file secure and don't expose in production
 const CONFIG = {
   // Base64 encoded Google Sheets URL to make it less obvious in browser inspector
