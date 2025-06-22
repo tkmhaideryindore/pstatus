@@ -84,11 +84,17 @@ async function searchSheet() {
     if (matchingRow) {
       const fullName = matchingRow[1] || 'Name not available';
       statusDisplay.innerHTML = `${fullName} - <b>VALID PASS ENTRY</b>`;
+      statusDisplay.classList.remove('invalid');
+      statusDisplay.classList.add('valid');
     } else {
       statusDisplay.textContent = 'NOT A VALID PASS ENTRY';
+      statusDisplay.classList.remove('valid');
+      statusDisplay.classList.add('invalid');
     }
   } catch (error) {
     statusDisplay.textContent = `Error fetching data`;
+    statusDisplay.classList.remove('valid');
+    statusDisplay.classList.add('invalid');
   }
   statusDisplay.classList.add('active');
   
