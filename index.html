@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -13,8 +12,16 @@
       <input type="text" id="searchInput" placeholder="Enter ITS ID...">
       <button onclick="searchSheet()">Search</button>
     </div>
+    <--!
     <div id="statusDisplay" class="status-display"></div>
+    <div class="log-controls">
+      <button onclick="downloadLogs()" class="log-btn">Download Local Logs</button>
+      <button onclick="clearLogs()" class="log-btn clear-btn">Clear Local Logs</button>
+      <button onclick="openGoogleSheet()" class="log-btn view-btn">View All Logs</button>
+      <span id="logCount" class="log-count">Local Logs: 0</span>
+    </div>
   </div>
+  -->
   <script src="config.js"></script>
   <script src="script.js?v=1.0.4"></script>
 </body>
