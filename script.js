@@ -160,9 +160,9 @@ function getSessionId() {
 // Send log entry to Google Sheets via Apps Script
 async function sendLogToSheet(logEntry) {
   // You'll need to replace this URL with your Google Apps Script web app URL
-  const GOOGLE_APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+  const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyPcVx_0MSksBB6BO6h2PSb2GorfxQyR7mbcOgNxJchV9iCiC7qnSu5G4WtgC1oqU5r/exec';
 
-  const response = await fetch(https://script.google.com/macros/s/AKfycbyPcVx_0MSksBB6BO6h2PSb2GorfxQyR7mbcOgNxJchV9iCiC7qnSu5G4WtgC1oqU5r/exec, {
+  const response = await fetch(YOUR_APPS_SCRIPT_URL_HERE, {
     method: 'POST',
     mode: 'cors',
     headers: {
