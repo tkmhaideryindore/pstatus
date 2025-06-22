@@ -82,7 +82,7 @@ async function searchSheet() {
 
     if (matchingRow) {
       const fullName = matchingRow[1] || 'Name not available';
-      statusDisplay.innerHTML = `<b>VALID PASS ENTRY</b>`;
+      statusDisplay.innerHTML = `${fullName} - <b>VALID PASS ENTRY</b>`;
       statusDisplay.classList.remove('invalid');
       statusDisplay.classList.add('valid');
       addLogEntry(searchTerm, fullName, 'VALID');
